@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Birthday Dashboard</title>
+<style>
+:root{--card:rgba(255,255,255,.06);--line:rgba(255,170,205,.28);--rose:#ff9fc4;--txt:#eaf3ff;--mut:#9db4d6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(ellipse at 20% 0,#12507a 0,#06142e 55%,#030a1a 100%) fixed;color:var(--txt);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;min-height:100vh;line-height:1.5}
+header{position:sticky;top:0;z-index:10;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(6,20,46,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+header h1{font-size:1rem;font-weight:600}header h1 span{color:var(--rose)}
+button,.btn{font:inherit;font-size:.9rem;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--txt);padding:9px 16px;border-radius:999px}
+button:disabled{opacity:.5}
+.pri{background:linear-gradient(135deg,#ff7aa8,#c2417a);border-color:transparent;font-weight:600}
+.danger{color:#ffb4b4}
+main{max-width:900px;margin:0 auto;padding:14px 14px 110px;display:grid;gap:14px}
+.note{background:rgba(255,217,160,.08);border:1px solid rgba(255,217,160,.3);border-radius:14px;padding:12px 14px;font-size:.86rem;color:#ffe6c0}
+.note b{color:#fff}
+section{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+section>summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;font-weight:600}
+section>summary::-webkit-details-marker{display:none}
+section>summary small{color:var(--mut);font-weight:400;font-size:.76rem;margin-left:8px}
+section>summary::after{content:"▾";color:var(--rose);margin-left:10px}
+section[open]>summary::after{content:"▴"}
+.body{padding:2px 16px 16px;display:grid;gap:12px}
+label{display:grid;gap:5px;font-size:.78rem;color:var(--mut)}
+input,textarea{font:inherit;font-size:16px;color:var(--txt);background:rgba(2,10,28,.6);border:1px solid rgba(160,190,230,.25);border-radius:10px;padding:10px 12px;width:100%;outline:none}
+input:focus,textarea:focus{border-color:var(--rose)}
+textarea{resize:vertical;min-height:70px}textarea.tall{min-height:240px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.two{grid-template-columns:1fr}}
+.item{display:grid;gap:8px;padding:12px;border:1px dashed rgba(160,190,230,.25);border-radius:12px;background:rgba(255,255,255,.03);position:relative}
+.num{font-size:.72rem;color:var(--rose);letter-spacing:.15em}
+.x{position:absolute;top:8px;right:8px;padding:2px 10px}
+.add{justify-self:start}
+.hint{font-size:.76rem;color:var(--mut)}
+.ph{display:grid;grid-template-columns:84px 1fr;gap:10px;align-items:center}
+.thumb{width:84px;height:84px;border-radius:10px;background:rgba(2,10,28,.6) center/cover no-repeat;border:1px solid rgba(160,190,230,.25);display:grid;place-items:center;font-size:.7rem;color:var(--mut);text-align:center;overflow:hidden}
+.thumb video,.thumb img{width:100%;height:100%;object-fit:cover}
+.pbtns{display:flex;gap:8px;flex-wrap:wrap}
+.pbtns input[type=file]{display:none}
+.stat{font-size:.78rem;color:var(--mut)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);max-width:92vw;background:#0d2a52;border:1px solid var(--line);padding:10px 18px;border-radius:16px;font-size:.88rem;z-index:30;display:none;text-align:center}
+.toast.on{display:block}
+.toast.err{background:#4a1530}
+</style>
+</head>
+<body>
+<header>
+  <h1>🐢 Birthday <span>Dashboard</span></h1>
+  <button id="save" class="pri">☁ Save to site</button>
+</header>
+<main>
+  <div class="note"><b>Kaise use kare:</b> text badlo, photo/video chuno, phir upar <b>Save to site</b> dabao. 1-2 minute me site pe naya dikhega.</div>
+
+  <details class="sec" id="setup"><summary>Setup <small id="setupState"></small></summary><div class="body">
+    <label>GitHub token (sirf is phone me save hota hai)<input id="tok" type="password" autocomplete="off" placeholder="github_pat_..."></label>
+    <div class="two"><label>GitHub username<input id="owner" autocapitalize="off"></label><label>Repo naam<input id="repo" autocapitalize="off"></label></div>
+    <div class="pbtns"><button id="saveTok">Token save karo</button><button id="loadBtn">Site se current text lao</button></div>
+    <div class="hint">Token banane ke steps GitHub → Settings → Developer settings → Fine-grained tokens me hain: sirf is repo ko chuno aur Contents = Read and write do.</div>
+  </div></details>
+
+  <details class="sec" open><summary>Basic <small>naam, signature</small></summary><div class="body">
+    <div class="two"><label>Uska nickname<input data-k="name"></label><label>Tumhara signature<input data-k="from"></label></div>
+    <label>Title ke neeche wali line<input data-k="subtitle"></label>
+    <label>Shuruaat ki line<input data-k="introLine"></label>
+    <label>Relationship start date (khali = counter nahi)<input type="date" data-k="startDate"></label>
+  </div></details>
+
+  <details class="sec" open><summary>Photos / Videos <small>caption + shayari</small></summary><div class="body">
+    <div id="memories" style="display:grid;gap:10px"></div>
+    <div class="hint">Photo apne aap chhoti (1600px) hoke upload hoti hai. Video 25 MB se chhota rakho. Khali slot site pe nahi dikhta.</div>
+  </div></details>
+
+  <details class="sec"><summary>Letter</summary><div class="body">
+    <label>Letter ki shuruaat<input data-k="letterTitle"></label>
+    <label>Letter<textarea class="tall" data-k="letter"></textarea></label>
+  </div></details>
+
+  <details class="sec"><summary>Last page</summary><div class="body">
+    <label>Bada title<input data-k="finalTitle"></label>
+    <label>Neeche ka message<textarea data-k="finalMsg"></textarea></label>
+  </div></details>
+
+  <details class="sec"><summary>Envelopes <small>jab udaas ho…</small></summary><div class="body"><div id="openWhen" style="display:grid;gap:10px"></div><button class="add" data-add="openWhen">+ envelope</button></div></details>
+
+  <details class="sec"><summary>Story lines</summary><div class="body"><div id="storyLines" style="display:grid;gap:10px"></div><button class="add" data-add="storyLines">+ line</button><div class="hint">&lt;b&gt;word&lt;/b&gt; likhne se word gold ho jata hai.</div></div></details>
+
+  <details class="sec"><summary>Trailer lines</summary><div class="body"><div id="trailer" style="display:grid;gap:10px"></div><button class="add" data-add="trailer">+ line</button></div></details>
+
+  <details class="sec"><summary>Gallery board <small>notes</small></summary><div class="body">
+    <label>Beech wala note<textarea data-k="boardNote"></textarea></label>
+    <label>Signature<input data-k="boardSig"></label>
+    <div class="two"><label>Left note<textarea data-k="leftNote"></textarea></label><label>Pink sticky note<textarea data-k="sticky"></textarea></label></div>
+  </div></details>
+
+  <details class="sec"><summary>PIN lock</summary><div class="body">
+    <label>PIN (4 ank)<input data-k="lock.pin" inputmode="numeric" maxlength="8"></label>
+  </div></details>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const DEFAULTS={"name": "Jannu", "from": "Your's 🐢", "startDate": "", "introLine": "Aaj ki raat sitare sirf tumhare liye jag rahe hain…", "subtitle": "meri duniya, meri muskaan, meri sabse khoobsurat kahani", "boardNote": "Aaj ka din bas tumhara hai.\nHamesha muskuraati raho, chamakti raho —\nmain tumhari life me sabse lucky insaan hoon ♡", "boardSig": "— Always & Forever", "leftNote": "Wahi tum…\nZyada sapne…\nBadi zindagi…\nSaath me ♡", "sticky": "♡  Bade sapne\n♡  Roshan din\n♡  Dher saari khushi\n♡  Acchi sehat\n♡  Poori duniya ka pyaar", "storyLines": ["Kuch log <b>zindagi<\/b> me aate nahi…", "Woh bas ek din <b>sab kuch<\/b> ban jaate hain.", "Tumse milne se pehle, din bas din the.", "Ab har din ka ek <b>reason<\/b> hai — tum.", "Aaj tumhara din hai.", "Aur main chahta hoon ki tum <b>feel<\/b> karo ki tum kitni khaas ho. ❤"], "memories": [{"caption": "Jab pehli baar mile", "msg": "Ek nazar mein hi dil ne keh diya tha,\nyahi hai woh, jise mere naam ka hona tha."}, {"caption": "Hamari pehli date", "msg": "Dil ghabra raha tha, par tum muskurayi,\naur saari ghabrahat khushi ban gayi."}, {"caption": "Woh pagal din", "msg": "Tere saath har pagalpan bhi hasee lagta hai,\nwarna duniya mein sukoon kahan milta hai."}, {"caption": "Meri favourite smile", "msg": "Teri ek muskaan se din bhar ki thakaan mit jaati hai,\nyeh hasi meri duniya ki roshni ban jaati hai."}, {"caption": "Hum dono", "msg": "Tu paas ho to har fikar peeche rah jaati hai,\nbas tum aur main, baaki duniya kho jaati hai."}, {"caption": "Aur abhi bahut baaki hai", "msg": "Abhi to bas shuruaat hai hamari kahani ki,\nlamba safar hai, tera saath umar bhar ka chahiye."}], "lock": {"pin": "2021", "question": "", "answers": [], "hint": ""}, "trailer": ["Ek ladki…", "Ek samundar jaisi gehri kahani…", "Ek raat…", "Aur ek <b>surprise<\/b>."], "openWhen": [{"label": "Jab udaas ho", "msg": "Yaad rakhna, tum jitni mazboot ho utna tumhe khud nahi pata. Aur main hamesha tumhare saath hoon. Ek gehri saans lo… sab theek hoga ♡"}, {"label": "Jab meri yaad aaye", "msg": "Aankhein band karo… main wahi hoon, tumhare paas. Ya bas ek call kar do — main sab chhod ke aa jaunga ♡"}, {"label": "Jab hasna ho", "msg": "Tum jab hasti ho na, duniya ke saare tension gayab ho jaate hain. Chalo, ab ek badi si smile do 😄"}, {"label": "Jab thak jao", "msg": "Aaj kuch mat socho. Aaram karo, chai piyo. Tum bahut accha kar rahi ho, aur main tumpe bahut garv karta hoon ♡"}], "letterTitle": "Meri Jannu,", "letter": "Aaj ka din sirf tumhara hai, kyunki is din duniya ko woh insaan mila jisne meri duniya badal di.\n\nTumhari hasi meri favourite awaaz hai, tumhari aankhein meri favourite jagah, aur tumhara saath meri sabse badi khushi.\n\nMujhe nahi pata maine aisa kya accha kiya ki tum meri life me aayi, par main roz uska shukriya karta hoon.\n\nAaj main bas yeh kehna chahta hoon — tum jaisi ho, waisi hi perfect ho. Hamesha muskuraati raho, hamesha khush raho, aur main hamesha tumhare saath rahoonga.\n\nHappy Birthday, meri jaan. I love you — aaj, kal, aur har birthday ke baad bhi.", "finalTitle": "love you, forever ❤", "finalMsg": "Happy Birthday meri Jannu🎂 — hamari kahani me abhi bahut saari Yade judni baaki hain."};
+const MAXP=20, SK='bday_admin_v1';
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+let D=JSON.parse(JSON.stringify(DEFAULTS));
+let S={tok:'',owner:'zenoteladitya',repo:'Kanmani-a',branch:'main'};
+try{Object.assign(S,JSON.parse(localStorage.getItem(SK)||'{}'))}catch(e){}
+const pend={};            // slot -> {file, kind:'img'|'vid'} | {remove:true}
+let remote={};            // slot -> {name, sha, path}
+let ver=Date.now();
+function toast(m,err,sticky){const t=$('#toast');t.textContent=m;t.className='toast on'+(err?' err':'');clearTimeout(toast.t);if(!sticky)toast.t=setTimeout(()=>t.classList.remove('on'),err?6000:3000)}
+function get(k){return k.split('.').reduce((o,p)=>o&&o[p],D)}
+function set(k,v){const ps=k.split('.');let o=D;while(ps.length>1){const p=ps.shift();o=o[p]=o[p]||{}}o[ps[0]]=v}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+function bindFields(){$$('[data-k]').forEach(el=>{el.value=get(el.dataset.k)==null?'':get(el.dataset.k);el.oninput=()=>set(el.dataset.k,el.value)})}
+
+/* ---------- lists ---------- */
+const LISTS={
+ trailer:{kind:'str',empty:''},
+ storyLines:{kind:'str',empty:'',area:true},
+ openWhen:{kind:'obj',fields:[['label','Envelope pe likha'],['msg','Andar ka message',true]],empty:{label:'',msg:''},max:8}
+};
+function renderList(name){const L=LISTS[name],box=$('#'+name);box.innerHTML='';
+ (D[name]||[]).forEach((it,i)=>{const d=document.createElement('div');d.className='item';
+  let h=`<span class="num">#${i+1}</span><button class="x danger" data-del="${i}">✕</button>`;
+  if(L.kind==='str')h+=L.area?`<textarea data-i="${i}">${esc(it)}</textarea>`:`<input data-i="${i}" value="${esc(it)}">`;
+  else L.fields.forEach(([f,lb,a])=>{h+=`<label>${lb}${a?`<textarea data-i="${i}" data-f="${f}">${esc(it[f])}</textarea>`:`<input data-i="${i}" data-f="${f}" value="${esc(it[f])}">`}</label>`});
+  d.innerHTML=h;box.appendChild(d)});
+ $$('[data-i]',box).forEach(el=>el.oninput=()=>{const i=+el.dataset.i;if(el.dataset.f)D[name][i][el.dataset.f]=el.value;else D[name][i]=el.value});
+ $$('[data-del]',box).forEach(b=>b.onclick=()=>{D[name].splice(+b.dataset.del,1);renderList(name)})}
+$$('[data-add]').forEach(b=>b.onclick=()=>{const n=b.dataset.add,L=LISTS[n];if(L.max&&D[n].length>=L.max)return toast('Max '+L.max,1);D[n].push(typeof L.empty==='object'?{...L.empty}:L.empty);renderList(n)});
+
+/* ---------- photo slots ---------- */
+function renderMem(){const box=$('#memories');box.innerHTML='';
+ D.memories=D.memories||[];
+ for(let i=0;i<MAXP;i++){const m=D.memories[i]=D.memories[i]||{caption:'',msg:''};
+  const n=i+1,p=pend[n],r=remote[n];
+  const d=document.createElement('div');d.className='item';
+  d.innerHTML=`<span class="num">PHOTO ${n}</span>
+  <div class="ph"><div class="thumb" id="th${n}"></div>
+   <div><div class="pbtns"><label class="btn" style="display:inline-block;cursor:pointer">📷 Chuno<input type="file" accept="image/*,video/*" data-f="${n}"></label>
+   <button data-rm="${n}" class="danger">Hatao</button></div><div class="stat" id="st${n}"></div></div></div>
+  <label>Caption<input data-c="${i}" value="${esc(m.caption)}"></label>
+  <label>Shayari / message<textarea data-m="${i}">${esc(m.msg)}</textarea></label>`;
+  box.appendChild(d);paintThumb(n)}
+ $$('[data-c]',box).forEach(e=>e.oninput=()=>D.memories[+e.dataset.c].caption=e.value);
+ $$('[data-m]',box).forEach(e=>e.oninput=()=>D.memories[+e.dataset.m].msg=e.value);
+ $$('[data-f]',box).forEach(e=>e.onchange=()=>{const f=e.files[0];if(!f)return;const n=+e.dataset.f;
+  const vid=f.type.startsWith('video');if(vid&&f.size>25*1024*1024){toast('Video 25 MB se bada hai',1);return}
+  pend[n]={file:f,kind:vid?'vid':'img'};paintThumb(n)});
+ $$('[data-rm]',box).forEach(b=>b.onclick=()=>{const n=+b.dataset.rm;pend[n]={remove:true};paintThumb(n)})}
+function paintThumb(n){const th=$('#th'+n),st=$('#st'+n);if(!th)return;const p=pend[n],r=remote[n];th.innerHTML='';
+ if(p&&p.remove){th.textContent='hatega';st.textContent=r?'Save par hat jayegi':'';return}
+ if(p&&p.file){const u=URL.createObjectURL(p.file);th.innerHTML=p.kind==='vid'?`<video src="${u}" muted></video>`:`<img src="${u}">`;st.textContent='Naya — save par upload hoga';return}
+ if(r){const u=`photos/${r.name}?v=${r.sha}`;th.innerHTML=/\.(mp4|webm|mov|m4v)$/i.test(r.name)?`<video src="${u}" muted></video>`:`<img src="${u}">`;st.textContent='Site pe hai';return}
+ th.textContent='khali';st.textContent=''}
+
+/* ---------- GitHub API ---------- */
+const api=(path,opt={})=>fetch(`https://api.github.com/repos/${S.owner}/${S.repo}/${path}`,{...opt,headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+S.tok,'Content-Type':'application/json',...(opt.headers||{})}});
+async function getFile(path){const r=await api(`contents/${path}?ref=${S.branch}`);if(r.status===404)return null;if(!r.ok)throw new Error('GitHub '+r.status);return r.json()}
+async function putFile(path,b64,msg){
+ for(let t=0;t<3;t++){const cur=await getFile(path);
+  const r=await api(`contents/${path}`,{method:'PUT',body:JSON.stringify({message:msg,content:b64,branch:S.branch,...(cur?{sha:cur.sha}:{})})});
+  if(r.ok)return r.json();if(r.status!==409&&r.status!==422)throw new Error('GitHub '+r.status+(r.status===401||r.status===403?' (token check karo)':''));await new Promise(z=>setTimeout(z,800))}
+ throw new Error('Upload fail: '+path)}
+async function delFile(path){const cur=await getFile(path);if(!cur)return;const r=await api(`contents/${path}`,{method:'DELETE',body:JSON.stringify({message:'remove '+path,sha:cur.sha,branch:S.branch})});if(!r.ok)throw new Error('Delete fail '+path)}
+const utf8b64=s=>btoa(unescape(encodeURIComponent(s)));
+const blobB64=b=>new Promise((res,rej)=>{const f=new FileReader();f.onload=()=>res(String(f.result).split(',')[1]);f.onerror=rej;f.readAsDataURL(b)});
+async function resizeImg(file,max=1600){
+ let bmp;try{bmp=await createImageBitmap(file,{imageOrientation:'from-image'})}catch(e){bmp=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(file)})}
+ const w=bmp.width||bmp.naturalWidth,h=bmp.height||bmp.naturalHeight,k=Math.min(1,max/Math.max(w,h));
+ const c=document.createElement('canvas');c.width=Math.round(w*k);c.height=Math.round(h*k);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+ return new Promise(res=>c.toBlob(res,'image/jpeg',.85))}
+function buildJS(){const out=JSON.parse(JSON.stringify(D));
+ out.memories=(out.memories||[]).slice(0,MAXP);while(out.memories.length&&!out.memories[out.memories.length-1].caption&&!out.memories[out.memories.length-1].msg)out.memories.pop();
+ out.ver=ver;
+ return '/* Birthday site texts — dashboard se bana. */\nwindow.CONFIG_OVERRIDE='+JSON.stringify(out,null,2)+';\n'}
+
+async function loadRemote(){
+ if(!S.tok)return toast('Pehle token daalo',1);
+ try{toast('Load ho raha hai…',0,1);
+  const lst=await getFile('photos');remote={};
+  (Array.isArray(lst)?lst:[]).forEach(f=>{const m=f.name.match(/^(\d+)\.(\w+)$/);if(m)remote[+m[1]]={name:f.name,sha:f.sha}});
+  const cfg=await getFile('config.js');
+  if(cfg){const txt=decodeURIComponent(escape(atob(cfg.content.replace(/\s/g,''))));const w={};new Function('window',txt)(w);if(w.CONFIG_OVERRIDE)D=Object.assign(JSON.parse(JSON.stringify(DEFAULTS)),w.CONFIG_OVERRIDE)}
+  for(const k in pend)delete pend[k];
+  init();toast('Site ka current text aa gaya')}catch(e){toast('Load nahi hua: '+e.message,1)}}
+
+async function saveAll(){
+ if(!S.tok)return toast('Pehle Setup me token daalo',1);
+ const btn=$('#save');btn.disabled=true;
+ try{ver=Date.now();
+  const slots=Object.keys(pend).map(Number).sort((a,b)=>a-b);
+  let k=0;
+  for(const n of slots){const p=pend[n];k++;toast(`Photo ${n} (${k}/${slots.length})…`,0,1);
+   const lst=await getFile('photos');const same=(Array.isArray(lst)?lst:[]).filter(f=>new RegExp('^'+n+'\\.').test(f.name));
+   if(p.remove){for(const f of same)await delFile('photos/'+f.name);delete remote[n]}
+   else{let name,b64;
+    if(p.kind==='img'){name=n+'.jpg';b64=await blobB64(await resizeImg(p.file))}
+    else{const ext=(p.file.name.split('.').pop()||'mp4').toLowerCase();name=n+'.'+(['mp4','webm','mov','m4v'].includes(ext)?ext:'mp4');b64=await blobB64(p.file)}
+    for(const f of same)if(f.name!==name)await delFile('photos/'+f.name);
+    const res=await putFile('photos/'+name,b64,'photo '+n);remote[n]={name,sha:res.content.sha}}
+   delete pend[n]}
+  toast('Text save ho raha hai…',0,1);
+  await putFile('config.js',utf8b64(buildJS()),'update text');
+  renderMem();
+  toast('Save ho gaya ✓ — 1-2 min me site pe dikhega',0)
+ }catch(e){toast('Save nahi hua: '+e.message,1)}
+ btn.disabled=false}
+
+function init(){bindFields();['trailer','storyLines','openWhen'].forEach(renderList);renderMem();$('#setupState').textContent=S.tok?'✓ token saved':'token chahiye'}
+$('#tok').value=S.tok;$('#owner').value=S.owner;$('#repo').value=S.repo;
+$('#saveTok').onclick=()=>{S.tok=$('#tok').value.trim();S.owner=$('#owner').value.trim();S.repo=$('#repo').value.trim();try{localStorage.setItem(SK,JSON.stringify(S))}catch(e){}$('#setupState').textContent=S.tok?'✓ token saved':'token chahiye';toast('Save ho gaya')};
+$('#loadBtn').onclick=()=>{S.tok=$('#tok').value.trim();S.owner=$('#owner').value.trim();S.repo=$('#repo').value.trim();loadRemote()};
+$('#save').onclick=saveAll;
+init();
+if(S.tok)loadRemote(); else $('#setup').open=true;
+</script>
+</body>
+</html>

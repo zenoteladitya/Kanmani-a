@@ -612,7 +612,7 @@ body::after{content:"";position:fixed;inset:0;z-index:59;pointer-events:none;bac
 
 <div id="envCard"><div id="envPaper"><div id="envLbl"></div><div id="envTxt"></div></div><div class="hint" style="margin-top:3vh">tap to close</div></div>
 
-<script src="config.js"></script>
+<script>document.write('<script src="config.js?t='+Date.now()+'"><\/script>')</script>
 <script>
 /* =====================================================================
    ✏️  CONFIG — SIRF YAHAN EDIT KARO
@@ -1124,9 +1124,9 @@ function sparkle(){if(!AC||!musicOn)return;[1318,1568,2093].forEach((f,i)=>note(
 
 /* ---------- SCRAPBOOK CINEMA: photos + videos (photos/1.jpg, 2.mp4 ...) ---------- */
 function probe(n){return new Promise(res=>{const exts=['jpg','jpeg','png','webp','JPG','JPEG','PNG'];let i=0;
-  (function next(){if(i>=exts.length)return res(null);const src=`photos/${n}.${exts[i++]}`;const im=new Image();im.onload=()=>res(src);im.onerror=next;im.src=src})()})}
+  (function next(){if(i>=exts.length)return res(null);const src=`photos/${n}.${exts[i++]}${CONFIG.ver?'?v='+CONFIG.ver:''}`;const im=new Image();im.onload=()=>res(src);im.onerror=next;im.src=src})()})}
 function probeVid(n){return new Promise(res=>{const exts=['mp4','webm','mov','m4v','MP4','MOV'];let i=0;
-  (function next(){if(i>=exts.length)return res(null);const src=`photos/${n}.${exts[i++]}`;const v=document.createElement('video');v.preload='metadata';v.onloadedmetadata=()=>res(src);v.onerror=next;v.src=src})()})}
+  (function next(){if(i>=exts.length)return res(null);const src=`photos/${n}.${exts[i++]}${CONFIG.ver?'?v='+CONFIG.ver:''}`;const v=document.createElement('video');v.preload='metadata';v.onloadedmetadata=()=>res(src);v.onerror=next;v.src=src})()})}
 const BW=1600,BH=1040,PW=250,PH=354;
 const SLOTS=[[230,250,-5],[1370,790,-4],[1370,260,4],[230,790,3],[520,185,3],[1080,845,4],[1080,195,-3],[520,855,-3]];
 let items=[],curPage=-1,ci=-1,cTok=0,typeTok=0,cTimer=null,paused=false,sndMuted=false,focusEl=null,curAdvance=null;
