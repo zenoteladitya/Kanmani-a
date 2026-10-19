@@ -1,17 +1,18 @@
 /* config.js — yahan sirf text badlo (quotes " " ke andar). Har line ke aakhir me comma , rehne do. */
 window.CONFIG_OVERRIDE = {
+  birthday: "20 October",
   name: "Jannu",
   from: "Your's 🐢",
   startDate: "",
-  introLine: "Aaj ki raat sitare sirf tumhare liye jag rahe hain…",
+  introLine: "Aaj ki raat kuch toh khaas hai… shayad aasman ko bhi pata hai ki aaj kisi khoobsurat insaan ka din hai.",
   subtitle: "meri duniya, meri muskaan, meri sabse khoobsurat kahani",
   boardIntro: "Chalo… ek baar saari yaadein palat ke dekhte hain ♡",
   boardEnd: "Yeh sab bas shuruaat hai… photo pe tap karke dobara dekh sakti ho ♡",
-  boardNote: "Aaj ka din bas tumhara hai.\nHamesha muskuraati raho, chamakti raho —\nmain tumhari life me sabse lucky insaan hoon ♡",
-  boardSig: "— Always & Forever",
-  leftNote: "Wahi tum…\nZyada sapne…\nBadi zindagi…\nSaath me ♡",
-  sticky: "♡  Bade sapne\n♡  Roshan din\n♡  Dher saari khushi\n♡  Acchi sehat\n♡  Poori duniya ka pyaar",
-  letterTitle: "Meri Jannu,",
+  boardNote: "Aaj ka din sirf tumhara hai.\nTumhari muskaan meri sabse pyaari dua hai,\naur tumhara saath meri sabse badi khushi ♡",
+  boardSig: "— Hamesha tumhara",
+  leftNote: "Tum ho,\nto sab khoobsurat hai…\nHamesha, meri jaan ♡",
+  sticky: "♡  Tumhari hansi meri jaan\n♡  Tumhara saath meri khushi\n♡  Meri har dua mein tum\n♡  Tum meri duniya ho",
+  letterTitle: "To You, My Beautiful Soul… 💗",
   finalTitle: "love you, forever ❤",
   finalMsg: "Happy Birthday meri Jannu🎂 — hamari kahani me abhi bahut saari Yade judni baaki hain.",
 
@@ -42,13 +43,13 @@ window.CONFIG_OVERRIDE = {
   ],
 
   // letter: paragraphs ke beech khali line rakho. ` ` ke andar hi likhna.
-  letter: `Aaj ka din sirf tumhara hai, kyunki is din duniya ko woh insaan mila jisne meri duniya badal di.
+  letter: `Agar main tumhare liye aaj kuch maang sakta, toh bas itna maangta ki zindagi tumhe utni hi khoobsurat lage, jitni tum khud ho.
 
-Tumhari hasi meri favourite awaaz hai, tumhari aankhein meri favourite jagah, aur tumhara saath meri sabse badi khushi.
+Tumhari zindagi mein kabhi pyaar ki kami na ho, tumhe kabhi apni ahmiyat samjhane ki zaroorat na pade, aur tumhe hamesha koi aisa mile jiske paas tum bina kuch kahe bhi sukoon mehsoos kar sako.
 
-Mujhe nahi pata maine aisa kya accha kiya ki tum meri life me aayi, par main roz uska shukriya karta hoon.
+Tumhare aane wala har saal tumhe aur bhi khoobsurat yaadein de… aur aaj ka din tumhare liye unmein se ek ban jaaye.
 
-Aaj main bas yeh kehna chahta hoon — tum jaisi ho, waisi hi perfect ho. Hamesha muskuraati raho, hamesha khush raho, aur main hamesha tumhare saath rahoonga.
+Happy Birthday, You. 💗
 
-Happy Birthday, meri jaan. I love you — aaj, kal, aur har birthday ke baad bhi.`
+Some souls are simply too special to be described in words… and you are one of them. 🌙✨`
 };
