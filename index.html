@@ -49,7 +49,7 @@ h2.script,h1.script{font-family:'Romance','Pinyon Script',cursive;font-weight:40
 /* title */
 #nameBig{font-family:'Poem','Dancing Script',cursive;font-weight:600;letter-spacing:.02em;font-size:clamp(4.2rem,21vw,11rem);line-height:1.15;padding:.05em .3em .42em;margin-bottom:-.3em;opacity:0;transition:opacity 2.5s;
   background:linear-gradient(90deg,#ffc9dd,#ff7fae,#ff9fc4,#ffc9dd);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:250%;
-  will-change:opacity;filter:drop-shadow(0 0 25px rgba(255,143,177,.55))}
+  will-change:opacity;filter:none}
 #nameBig.show{opacity:1}
 @keyframes shine{to{background-position:250% 0}}
 #sub{margin-top:2vh;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(1.2rem,3.4vw,2rem);letter-spacing:.05em;text-transform:none;font-weight:300;opacity:0;transition:opacity 2s 3s;max-width:700px}
@@ -276,7 +276,7 @@ body.lockmode #gl,body.lockmode #bg,body.lockmode #fx{display:none!important}bod
 #cake .hint{display:inline-block;padding:10px 20px;border-radius:40px;opacity:.9}
 #cake #wishBox{padding:16px 22px 12px;border-radius:24px}
 #cake #wishBox .hint{background:none;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;padding:0 0 8px;display:block}
-#nameBig{-webkit-text-stroke:0;filter:drop-shadow(0 0 18px rgba(255,150,190,.5))}
+#nameBig{-webkit-text-stroke:0;filter:none}
 h2.script,h1.script{-webkit-text-stroke:0}
 
 /* personal whisper lines (replaces chapter titles) */
@@ -309,7 +309,7 @@ h2.script,h1.script{-webkit-text-stroke:0}
 .gift.open .beam{opacity:1}
 .gift:not(.open):hover .chest{transform:scale(1.04) rotate(-1deg);transition:transform .4s}
 #cMsg{display:none!important}
-#nameBig{transition:none!important}
+#nameBig{transition:opacity 1.6s!important}
 .paper,#envPaper{--ink:#3a2310;position:relative;background:
  radial-gradient(circle at 12% 88%,rgba(25,10,0,.75) 0,rgba(25,10,0,0) 7%),
  radial-gradient(circle at 93% 7%,rgba(25,10,0,.7) 0,rgba(25,10,0,0) 6%),
@@ -618,6 +618,7 @@ body::after{content:"";position:fixed;inset:0;z-index:59;pointer-events:none;bac
    ✏️  CONFIG — SIRF YAHAN EDIT KARO
    ===================================================================== */
 const CONFIG = {
+  birthday: "20 October",            // <-- birthday ki date (title pe dikhti hai)
   name: "Jannu",                      // <-- uska nickname (jo butterflies se banega)
   from: "Your's 🐢",                     // <-- tumhara naam / signature
   startDate: "",                      // <-- relationship start, jaise "2024-02-14" (khali chhodo to counter nahi dikhega)
@@ -1071,12 +1072,14 @@ async function formName(text){
 function releaseName(){for(const f of nameFlies){f.mode='burst';f.vx=(Math.random()-.5)*8;f.vy=-Math.random()*6-2;f.life=60;f.fade=1;f.role=''}nameFlies=[]}
 let titleRun=0;
 async function showTitle(){
-  const id=++titleRun,tl=$('#title');tl.classList.remove('ready');$('#nameBig').classList.add('show');
-  await sleep(1900);if(id!==titleRun||current!=='title')return;
-  await formName(CONFIG.name);await sleep(3200);if(id!==titleRun||current!=='title')return;
+  const id=++titleRun,tl=$('#title');tl.classList.remove('ready');$('#nameBig').classList.remove('show');
+  await sleep(1200);if(id!==titleRun||current!=='title')return;
+  await formName(CONFIG.name);await sleep(3600);if(id!==titleRun||current!=='title')return;
+  $('#nameBig').classList.add('show');await sleep(1100);if(id!==titleRun||current!=='title')return;
+  for(const f of nameFlies){f.mode='burst';f.vx=(Math.random()-.5)*6;f.vy=-Math.random()*7-3;f.life=170;f.fade=1}
+  nameFlies=[];
+  await sleep(900);if(id!==titleRun||current!=='title')return;
   tl.classList.add('ready');
-  await sleep(1500);for(const f of nameFlies){f.mode='burst';f.vx=(Math.random()-.5)*5;f.vy=-Math.random()*4-1;f.life=140;f.fade=1}
-  if(id===titleRun)nameFlies=[];
 }
 
 /* ---------- fireworks + confetti ---------- */
@@ -1210,7 +1213,7 @@ async function overview(){
   cam(BW/2,BH/2,zoomO(),2.6,BW,BH);$('#snd').classList.add('hidden');$$('#dots i').forEach(d=>d.className='done');
   burst(W/2,H*.4,14,7);sparkle();
   const b=$('#toCake');b.classList.remove('hidden');b.classList.add('fade-up')}
-function userPick(i){paused=true;$('#cine').classList.add('paused');$('#pp').textContent='▶';showItem(i)}
+function userPick(i){paused=false;$('#cine').classList.remove('paused');$('#pp').textContent='❚❚';showItem(i)}
 function startCine(){
   paused=false;$('#cine').classList.remove('paused');$('#pp').textContent='❚❚';$('#toCake').classList.add('hidden');$('#cMsg').textContent='';
   const my=++cTok;
@@ -1230,14 +1233,14 @@ $('#pp').onclick=()=>{const v=focusEl&&focusEl.querySelector('video');paused=!pa
   else{if(v)v.play().catch(()=>{});const f=curAdvance;if(f)cTimer=setTimeout(f,v?Math.max(2000,(v.duration-v.currentTime)*1000):4500)}};
 $('#snd').onclick=()=>{sndMuted=!sndMuted;const v=focusEl&&focusEl.querySelector('video');if(v)v.muted=sndMuted;setDuck(!sndMuted);$('#snd').textContent=sndMuted?'🔇':'🔊'};
 $('#board').addEventListener('click',e=>{const pz=e.target.closest('.pz');
-  if(pz)userPick(+pz.dataset.i);else if(focusEl){paused=true;$('#cine').classList.add('paused');$('#pp').textContent='▶';overview()}});
+  if(pz)userPick(+pz.dataset.i)});
 let sx=null;$('#cine').addEventListener('pointerdown',e=>{sx=e.clientX});
 $('#cine').addEventListener('pointerup',e=>{if(sx===null)return;const dx=e.clientX-sx;sx=null;if(Math.abs(dx)>80&&!e.target.closest('button'))userPick(Math.max(0,Math.min(items.length-1,ci+(dx<0?1:-1))))});
 addEventListener('keydown',e=>{if(current!=='gallery')return;if(e.key==='ArrowRight')$('#next').click();if(e.key==='ArrowLeft')$('#prev').click();if(e.key===' '){e.preventDefault();$('#pp').click()}});
 
 /* ---------- build ---------- */
 $('#introLine').textContent=CONFIG.introLine;$('#dear').textContent=CONFIG.letterTitle;$('#sign').textContent=CONFIG.from;
-$('#finalTitle').textContent=CONFIG.finalTitle;$('#finalMsg').textContent=CONFIG.finalMsg;$('#sub').textContent=CONFIG.subtitle;
+$('#finalTitle').textContent=CONFIG.finalTitle;$('#finalMsg').textContent=CONFIG.finalMsg;$('#sub').textContent=CONFIG.subtitle;{const eb=document.querySelector('#title .eyebrow');if(eb)eb.textContent='Happy Birthday'+(CONFIG.birthday?' · '+CONFIG.birthday:'')}
 for(let i=0;i<5;i++){const c=document.createElement('div');c.className='candle';c.innerHTML='<div class="flame"></div>';c.onclick=()=>snuff(c);$('#candles').appendChild(c)}
 galleryReady=buildGallery();
 
